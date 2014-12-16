@@ -15,7 +15,7 @@ n4 = IPv4Net("5.6.7.0/24")
 @test IPv4Net("1.2.3.4", 24) == n1
 @test n1 == n2
 
-@test isless(n1,n3) == true
+@test isless(n1,n3) == false
 @test isless(n1,n4) == true
 
 @test n1[5] == ip1
@@ -40,7 +40,7 @@ o4 = IPv6Net("2001:2::8/64")
 @test IPv6Net("2001:1::", 64) == o1
 @test o1 == o2
 
-@test isless(o1,o3) == true
+@test isless(o1,o3) == false
 @test isless(o1,o4) == true
 
 @test o1[5] == ip61
