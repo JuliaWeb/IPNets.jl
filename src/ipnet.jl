@@ -208,7 +208,7 @@ end
 IPv4Net{A,M}(tuple::(A,M)) = IPv4Net(tuple[1],tuple[2])
 
 
-# "1.2.3.4/24"
+# "1.2.3.0/24"
 function IPv4Net(ipmask::AbstractString)
     if search(ipmask,'/') > 0
         addrstr, netmaskstr = split(ipmask,"/")
@@ -222,7 +222,7 @@ function IPv4Net(ipmask::AbstractString)
 end
 
 
-# "1.2.3.4", "255.255.255.0"
+# "1.2.3.0", "255.255.255.0"
 function IPv4Net(netaddr::AbstractString, netmask::AbstractString)
     netaddr = IPv4(netaddr).host
     netmask = contiguousbitcount(IPv4(netmask).host)
@@ -230,8 +230,8 @@ function IPv4Net(netaddr::AbstractString, netmask::AbstractString)
 end
 
 
-# "1.2.3.4", 24
-IPv4Net(netaddr::AbstractString, netmask::Integer) = IPv4Net(IPv4(ipaddr), netmask)
+# "1.2.3.0", 24
+IPv4Net(netaddr::AbstractString, netmask::Integer) = IPv4Net(IPv4(netaddr), netmask)
 
 # 123872, 24
 IPv4Net(ipaddr::Integer, netmask::Integer) = IPv4Net(IPv4(ipaddr), netmask)
