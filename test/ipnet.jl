@@ -1,6 +1,12 @@
 using IPNets
 using Base.Test
 using Compat
+
+if VERSION.minor < 4
+    const IPAddr = Base.IpAddr
+end
+
+
 # IPv4
 
 ip41 = IPv4("1.2.3.4")
