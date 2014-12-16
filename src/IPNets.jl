@@ -1,6 +1,6 @@
 module IPNets
 
-    if VERSION.minor < 4
+    if VERSION < v"0.4.0-dev+412"
         const IPAddr = Base.IpAddr
     else
         import Base: IPAddr
@@ -14,9 +14,7 @@ module IPNets
 
     export
         # types
-        IPNet, IPv4Net, IPv6Net,
+        IPNet, IPv4Net, IPv6Net
 
-        # methods
-        isless
     include("ipnet.jl")
 end
