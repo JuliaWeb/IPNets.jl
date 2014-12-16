@@ -4,6 +4,8 @@ using Compat
 
 if VERSION.minor < 4
     const IPAddr = Base.IpAddr
+else
+    import Base.IPAddr
 end
 
 
