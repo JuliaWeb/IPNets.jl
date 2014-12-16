@@ -142,12 +142,12 @@ end
 # IP Networks are ordered first by starting network address
 # and then by network mask. That is, smaller IP nets (with higher
 # netmask values) are "less" than larger ones. This corresponds
-# to secondary ordering by ending address.
+# to secondary reverse ordering by ending address.
 function isless(a::IPNet, b::IPNet)
     if a.netaddr == b.netaddr
         return isless(a.netmask, b.netmask)
     else
-        return isless(a.netaddr, b.netaddr)
+        return isless(b.netaddr, a.netaddr)
     end
 end
 
