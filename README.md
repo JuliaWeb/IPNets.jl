@@ -10,8 +10,10 @@ networks can be described using *IPNets.jl* using standard, intuitive syntax.
 ### Main Features
 
 An important aspect of *IPNets.jl* is the ability to treat IP networks as
-vectors. That is, common vector operations such as membership testing and
-indexing are fully supported with IPNet types. The following examples should help clarify:
+vectors while not actually allocating the memory required to store a full
+range of addresses. Common vector operations such as membership testing and
+indexing are fully supported with `IPNet` types. The following examples should
+help clarify:
 
 *create a network with 24-bit netmask*
 ```
@@ -76,4 +78,15 @@ IPv4Net("1.2.4.0/24")
 julia> ip4net < newnet
 true
 ```
+
+*memory usage is minimal (476 bytes to represent the entire IPv4 address space)*
+```
+julia> @time a = IPv4Net("0.0.0.0/0")
+elapsed time: 1.3325e-5 seconds (476 bytes allocated)
+IPNets.IPv4Net("0.0.0.0/0")
+
+julia> size(a)
+(4294967296,)
+```
+
 Though these examples use the `IPv4Net` type, the `IPv6Net` type is also available with similar behavior.
