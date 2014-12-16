@@ -9,14 +9,13 @@ module IPNets
     using Compat
     import Base: IPv4, IPv6, parseipv4, parseipv6
     import Base: length, size, endof, minimum, maximum, extrema, isless
-    import Base: in, contains
+    import Base: in, contains, issubset
     import Base: display, show, string
 
     export
         # types
-        IPNet, IPv4Net, IPv6Net,
+        IPNet, IPv4Net, IPv6Net
 
         # methods
-        isless
     include("ipnet.jl")
 end

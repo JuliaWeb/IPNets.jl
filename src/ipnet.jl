@@ -151,6 +151,11 @@ function isless(a::IPNet, b::IPNet)
     end
 end
 
+function issubset(a::IPNet, b::IPNet)
+    astart, aend = extrema(a)
+    bstart, bend = extrema(b)
+    return (bstart <= astart <= aend <= bend)
+end
 
 function in(ipaddr::IPAddr, net::IPNet)
     netstart = net.netaddr.host

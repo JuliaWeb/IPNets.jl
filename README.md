@@ -70,12 +70,12 @@ julia> extrema(ip4net)
 (ip"1.2.3.0",ip"1.2.3.255")
 ```
 
-*alternate construction and comparison*
+*alternate construction and subset comparison*
 ```
-julia> newnet = IPv4Net("1.2.4.0", 24)
-IPv4Net("1.2.4.0/24")
+julia> newnet = IPv4Net("1.2.3.16", 28)
+IPv4Net("1.2.3.16/28")
 
-julia> ip4net < newnet
+julia> newnet ⊆ ip4net
 true
 ```
 
@@ -90,3 +90,9 @@ julia> size(a)
 ```
 
 Though these examples use the `IPv4Net` type, the `IPv6Net` type is also available with similar behavior.
+
+###Known Issues
+- Extrema measurements for `IPNets` representing the entire IPv4 or IPv6 address
+space will fail due to overrun of the native type used to describe the networks.
+- Non-contiguous subnetting for IPv4 addresses (e.g., a netmask of "255.240.255.0")
+is not supported. Subnets must be able to be represented as a series of contiguous mask bits.
