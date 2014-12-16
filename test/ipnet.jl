@@ -18,7 +18,7 @@ n4 = IPv4Net("5.6.7.0/24")
 @test isless(n1,n3) == false
 @test isless(n1,n4) == true
 
-@test n1[5] == ip1
+@test n1[5] == ip41
 @test isless(ip41,ip42) == true
 @test in(ip42, n4) == true
 @test contains(n4,ip42) == true
