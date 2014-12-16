@@ -25,7 +25,7 @@ n4 = IPv4Net("5.6.7.0/24")
 
 @test IPNets.contiguousbitcount(240,UInt8) == 0x04
 @test IPNets.contiguousbitcount(252,UInt8) == 0x06
-@test_throws ErrorException IPNets.contiguousbitcount(240,UInt8)
+@test_throws ErrorException IPNets.contiguousbitcount(241,UInt8)
 
 
 # IPv6
