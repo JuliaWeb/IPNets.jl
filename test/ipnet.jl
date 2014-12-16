@@ -1,6 +1,6 @@
 using IPNets
 using Base.Test
-
+using Compat
 # IPv4
 
 ip41 = IPv4("1.2.3.4")
