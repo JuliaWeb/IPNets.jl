@@ -230,8 +230,8 @@ function IPv4Net(netaddr::AbstractString, netmask::AbstractString)
 end
 
 
-# 182382, 24
-IPv4Net(ipaddr::Integer, netmask::Integer) = IPv4Net(IPv4(ipaddr), uint8(netmask))
+# "1.2.3.4", 24
+IPv4Net(netaddr::AbstractString, netmask::Integer) = IPv4Net(IPv4(ipaddr), netmask)
 
 
 ##################################################
