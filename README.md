@@ -72,7 +72,7 @@ julia> extrema(ip4net)
 
 *alternate construction and subset comparison*
 ```
-julia> newnet = IPv4Net("1.2.3.16", 28)
+julia> newnet = IPv4Net("1.2.3.16", "255.255.255.240")
 IPv4Net("1.2.3.16/28")
 
 julia> newnet ⊆ ip4net
