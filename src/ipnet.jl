@@ -61,7 +61,7 @@ function string(ip::IPv6)
 end
 
 
-function Base.isless(a::IPAddr, b::IPAddr)
+function Base.isless{T<:IPAddr}(a::T, b::T)
     return isless(a.host, b.host)
 end
 
@@ -143,7 +143,7 @@ end
 # and then by network mask. That is, smaller IP nets (with higher
 # netmask values) are "less" than larger ones. This corresponds
 # to secondary reordering by ending address.
-function isless(a::IPNet, b::IPNet)
+function isless{T<:IPNet}(a::T, b::T)
     if a.netaddr == b.netaddr
         return isless(b.netmask, a.netmask)
     else
@@ -151,17 +151,21 @@ function isless(a::IPNet, b::IPNet)
     end
 end
 
-function issubset(a::IPNet, b::IPNet)
+function issubset{T<:IPNet}(a::T, b::T)
     astart, aend = extrema(a)
     bstart, bend = extrema(b)
     return (bstart <= astart <= aend <= bend)
 end
 
 function in(ipaddr::IPAddr, net::IPNet)
-    netstart = net.netaddr.host
-    numbits = width(typeof(ipaddr)) - net.netmask
-    netend = net.netaddr.host + big(2)^numbits - 1
-    return netstart <= ipaddr.host <= netend
+    if typeof(net.netaddr) != typeof(ipaddr)
+        error("IPAddr is not the same type as IPNet")
+    else
+        netstart = net.netaddr.host
+        numbits = width(typeof(ipaddr)) - net.netmask
+        netend = net.netaddr.host + big(2)^numbits - 1
+        return netstart <= ipaddr.host <= netend
+    end
 end
 
 
