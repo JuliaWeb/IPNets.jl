@@ -5,8 +5,6 @@ IPv6broadcast = reinterpret(UInt128, int128(-1))
 # IP ADDRESS HANDLING OVERRIDES
 ##################################################
 # constructor: ("1.2.3.4")
-IPv4(ipstr::AbstractString) = parseipv4(ipstr)
-IPv6(ipstr::AbstractString) = parseipv6(ipstr)
 
 # Suppress leading '0's and "0x"
 string_ipv6_field(field::UInt16) = return(hex(field))
@@ -58,11 +56,6 @@ function string(ip::IPv6)
         end
     end
     return str
-end
-
-
-function Base.isless{T<:IPAddr}(a::T, b::T)
-    return isless(a.host, b.host)
 end
 
 
