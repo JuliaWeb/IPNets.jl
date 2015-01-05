@@ -57,3 +57,8 @@ o4 = IPv6Net("2001:2::8/64")
 @test isless(ip61, ip62) == true
 @test in(ip62, o4) == true
 @test contains(o4, ip62) == true
+
+p1 = IPv4Net("1.2.3.4/30")
+@test [x for x in p1] == [ip"1.2.3.4", ip"1.2.3.5", ip"1.2.3.6", ip"1.2.3.7"]
+p2 = IPv6Net("2001:1::4/126")
+@test [x for x in p2] == [ip"2001:1::4",ip"2001:1::5",ip"2001:1::6",ip"2001:1::7"]
