@@ -54,7 +54,15 @@ julia> ip4net[4:8]
  ip"1.2.3.1"
  ip"1.2.3.2"
  ip"1.2.3.3"
+
+julia> [x for x in ip4net][1:4]
+4-element Array{Any,1}:
+ ip"1.2.3.0"
+ ip"1.2.3.1"
+ ip"1.2.3.2"
+ ip"1.2.3.3"
 ```
+
 *equality*
 ```
 julia> ip4net[5] == ip4

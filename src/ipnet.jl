@@ -186,7 +186,8 @@ maximum(net::IPNet) = net[end]
 extrema(net::IPNet) = (minimum(net), maximum(net))
 getindex(net::IPNet, r::Range) = [net[i] for i in r]
 getindex(net::IPNet, i::(Integer,)) = getindex(net,i[1])
-
+start(net::IPNet) = net[1]
+next{T<:IPAddr}(net::IPNet, s::T) = s, T(s.host + 1)
 ##################################################
 # IPv4
 ##################################################
