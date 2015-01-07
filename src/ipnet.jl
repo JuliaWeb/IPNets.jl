@@ -182,9 +182,11 @@ IPv4Net(netaddr::AbstractString, netmask::Integer) = IPv4Net(IPv4(netaddr), netm
 # 123872, 24
 IPv4Net(ipaddr::Integer, netmask::Integer) = IPv4Net(IPv4(ipaddr), netmask)
 
+
 ##################################################
 # IPv6
 ##################################################
+
 immutable IPv6Net <: IPNet
     # we treat the netmask as a potentially noncontiguous bitmask
     # for speed of calculation and consistency, but RFC2373, section
