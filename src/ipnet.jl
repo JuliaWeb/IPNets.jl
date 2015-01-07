@@ -16,7 +16,7 @@ function contiguousbitcount(n::Integer,t=UInt32)
     # cbc(240,UInt8) == 0x04 ("1111 0000")
     # cbc(252,UInt8) == 0x06 ("1111 1100")
     # cbc(127,UInt8) == error ("0111 1111")
-    if sizeof(t) > 256
+    if sizeof(t) > 32  # bytes
         error("input too large")
     else
         n = convert(t,n)
@@ -34,11 +34,12 @@ end
 function mask2bits(t::Type, n::Unsigned)
     # takes a number of 1's bits in a
     # netmask and returns an integer representation
-    maskbits = width(t)-n
+    maskbits = int(width(t)) - int(n)
     if maskbits < 0
         throw(BoundsError())
+    else
+        return (~(uint128(2)^maskbits-1))
     end
-    return (~(uint128(2)^maskbits-1))
 end
 
 
@@ -219,7 +220,7 @@ function IPv6Net(ipmask::AbstractString)
         nmi = int(netmaskbits)
     else
         addrstr = ipmask
-        netmaskint = width(IPv6)
+        nmi = width(IPv6)
     end
     netaddr = IPv6(addrstr)
     netmask = nmi
