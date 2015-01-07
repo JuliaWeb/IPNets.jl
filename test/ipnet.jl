@@ -62,3 +62,14 @@ p1 = IPv4Net("1.2.3.4/30")
 @test [x for x in p1] == [ip"1.2.3.4", ip"1.2.3.5", ip"1.2.3.6", ip"1.2.3.7"]
 p2 = IPv6Net("2001:1::4/126")
 @test [x for x in p2] == [ip"2001:1::4",ip"2001:1::5",ip"2001:1::6",ip"2001:1::7"]
+
+@test endof(p1) == 4
+@test endof(p2) == 4
+@test minimum(p1) == ip"1.2.3.4"
+@test minimum(p2) == ip"2001:1::4"
+@test maximum(p1) == ip"1.2.3.7"
+@test maximum(p2) == ip"2001:1::7"
+@test extrema(p1) == (ip"1.2.3.4",ip"1.2.3.7")
+@test extrema(p2) == (ip"2001:1::4",ip"2001:1::7")
+@test getindex(p1,1:2) == [ip"1.2.3.4", ip"1.2.3.5"]
+@test getindex(p2,1:2) == [ip"2001:1::4", ip"2001:1::5"]

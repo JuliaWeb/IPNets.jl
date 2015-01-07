@@ -2,64 +2,6 @@ IPv4broadcast = reinterpret(UInt32, int32(-1))
 IPv6broadcast = reinterpret(UInt128, int128(-1))
 
 ##################################################
-# IP ADDRESS HANDLING OVERRIDES
-##################################################
-# constructor: ("1.2.3.4")
-
-# Suppress leading '0's and "0x"
-string_ipv6_field(field::UInt16) = return(hex(field))
-string_ipv6_field(ip,i) = string_ipv6_field(ipv6_field(ip,i))
-
-
-function string(ip::IPv6)
-    i = 8
-    m = 0
-    str = ""
-    longest_sub_i = -1
-    while i!=0
-        i-=1
-        field = ipv6_field(ip,i)
-        if field == 0 && longest_sub_i == -1
-            # Find longest subsequence of 0
-            longest_sub_i,j,m,c = i,i,1,1
-            while j != 0
-                j-=1
-                if ipv6_field(ip,j) == 0
-                    c += 1
-                else
-                    c = 0
-                end
-                if c > m
-                    if j+c != longest_sub_i+1
-                        longest_sub_i = j+c-1
-                    end
-                    m = c
-                end
-            end
-            # Prevent single 0 from contracting to :: as required
-            if m == 1
-                longest_sub_i = 9
-            end
-        end
-        if i == longest_sub_i
-            str = string(str,":")
-            i -= m-1
-            if i == 0
-                str = string(str,":")
-                break
-            end
-        else
-            if i != 7
-                str = string(str,":")
-            end
-            str = string(str, string_ipv6_field(field))
-        end
-    end
-    return str
-end
-
-
-##################################################
 # IPNet
 ##################################################
 width(::Type{IPv4}) = uint8(32)
