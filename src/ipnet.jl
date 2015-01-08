@@ -16,17 +16,14 @@ function contiguousbitcount(n::Integer,t=UInt32)
     # cbc(240,UInt8) == 0x04 ("1111 0000")
     # cbc(252,UInt8) == 0x06 ("1111 1100")
     # cbc(127,UInt8) == error ("0111 1111")
-    if sizeof(t) > 32  # bytes
-        error("input too large")
+
+    n = convert(t,n)
+    invn = ~n
+    bitct = log2(invn + 1)
+    if !isinteger(bitct)
+        error("noncontiguous bits")
     else
-        n = convert(t,n)
-        invn = ~n
-        bitct = log2(invn + 1)
-        if !isinteger(bitct)
-            error("noncontiguous bits")
-        else
-            return uint8(sizeof(t)*8 - int(bitct))
-        end
+        return uint8(sizeof(t)*8 - int(bitct))
     end
 end
 
@@ -151,10 +148,6 @@ immutable IPv4Net <: IPNet
 end
 
 
-# "(x,y)"
-IPv4Net{A,M}(tuple::(A,M)) = IPv4Net(tuple[1],tuple[2])
-
-
 # "1.2.3.0/24"
 function IPv4Net(ipmask::AbstractString)
     if search(ipmask,'/') > 0
@@ -177,11 +170,16 @@ function IPv4Net(netaddr::AbstractString, netmask::AbstractString)
 end
 
 
-# "1.2.3.0", 24
-IPv4Net(netaddr::AbstractString, netmask::Integer) = IPv4Net(IPv4(netaddr), netmask)
-
 # 123872, 24
 IPv4Net(ipaddr::Integer, netmask::Integer) = IPv4Net(IPv4(ipaddr), netmask)
+
+
+# "(x,y)"
+IPv4Net{A,M}(tuple::(A,M)) = IPv4Net(tuple[1],tuple[2])
+
+
+# "1.2.3.0", 24
+IPv4Net(netaddr::AbstractString, netmask::Integer) = IPv4Net(IPv4(netaddr), netmask)
 
 
 ##################################################
@@ -210,9 +208,6 @@ immutable IPv6Net <: IPNet
 end
 
 
-IPv6Net{T}(tuple::(T,T)) = IPv6Net(tuple[1],tuple[2])
-
-
 # "2001::1/64"
 function IPv6Net(ipmask::AbstractString)
     if search(ipmask,'/') > 0
@@ -233,3 +228,11 @@ function IPv6Net(netaddr::AbstractString, netmask::Integer)
     netaddr = IPv6(netaddr)
     return IPv6Net(netaddr, netmask)
 end
+
+
+# 123872, 128
+IPv6Net(ipaddr::Integer, netmask::Integer) = IPv6Net(IPv6(ipaddr), netmask)
+
+
+# (123872, 128)
+IPv6Net{A,M}(tuple::(A,M)) = IPv6Net(tuple[1],tuple[2])

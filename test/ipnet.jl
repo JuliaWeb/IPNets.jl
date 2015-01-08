@@ -28,7 +28,6 @@ o5 = IPv6Net("2001:1::4/126")
 @test IPv4Net((16909060,24)) == n1
 
 @test IPv4Net("1.2.3.4") == IPv4Net("1.2.3.4/32")
-
 @test n1 == n2
 
 @test isless(n1,n3) == false
@@ -46,8 +45,10 @@ o5 = IPv6Net("2001:1::4/126")
 @test IPNets.contiguousbitcount(252,UInt8) == 0x06
 @test_throws ErrorException IPNets.contiguousbitcount(241,UInt8)
 
-
 @test endswith(string(n5),"(\"1.2.3.4/30\")") == true
+@test endswith(sprint(print,n5),"(\"1.2.3.4/30\")") == true
+@test endswith(sprint(show,n5),"(\"1.2.3.4/30\")") == true
+@test endswith(string(display,n5),"(\"1.2.3.4/30\")") == true
 @test size(n5) == (4,)
 @test [x for x in n5] == [ip"1.2.3.4", ip"1.2.3.5", ip"1.2.3.6", ip"1.2.3.7"]
 @test endof(n5) == 4
@@ -65,6 +66,8 @@ o5 = IPv6Net("2001:1::4/126")
 # IPv6
 @test_throws ErrorException IPv6Net(ip61, 129)
 @test IPv6Net("2001:1::", 64) == o1
+@test IPv6Net(0x20010001000000000000000000000004,64) == o1
+@test IPv6Net((0x20010001000000000000000000000004,64)) == o1
 @test o1 == o2
 
 @test IPv6Net("2001:1::1") == IPv6Net("2001:1::1/128")
@@ -79,6 +82,9 @@ o5 = IPv6Net("2001:1::4/126")
 
 
 @test endswith(string(o5),"(\"2001:1::4/126\")") == true
+@test endswith(sprint(print,o5),"(\"2001:1::4/126\")") == true
+@test endswith(sprint(show,o5),"(\"2001:1::4/126\")") == true
+@test endswith(string(display,o5),"(\"2001:1::4/126\")") == true
 @test size(o5) == (4,)
 @test [x for x in o5] == [ip"2001:1::4",ip"2001:1::5",ip"2001:1::6",ip"2001:1::7"]
 @test endof(o5) == 4
