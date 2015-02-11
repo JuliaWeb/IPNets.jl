@@ -1,6 +1,6 @@
 ## IPNets.jl
-[![Build Status](https://travis-ci.org/sbromberger/IPNets.jl.svg?branch=master)](https://travis-ci.org/sbromberger/IPNets.jl)
-[![Coverage Status](https://img.shields.io/coveralls/sbromberger/IPNets.jl.svg)](https://coveralls.io/r/sbromberger/IPNets.jl?branch=master)
+[![Build Status](https://travis-ci.org/JuliaWeb/IPNets.jl.svg?branch=master)](https://travis-ci.org/JuliaWeb/IPNets.jl)
+[![Coverage Status](https://img.shields.io/coveralls/JuliaWeb/IPNets.jl.svg)](https://coveralls.io/r/JuliaWeb/IPNets.jl?branch=master)
 
 *IPNets.jl* is a Julia package that provides IP network types. Both IPv4 and IPv6
 networks can be described using *IPNets.jl* using standard, intuitive syntax.
