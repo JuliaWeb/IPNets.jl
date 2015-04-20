@@ -5,8 +5,8 @@ IPv6broadcast = typemax(UInt128)
 # IPNet
 ##################################################
 
-width(::Type{IPv4}) = @compat UInt8(32)
-width(::Type{IPv6}) = @compat UInt8(128)
+width(::Type{IPv4}) = @compat(UInt8(32))
+width(::Type{IPv6}) = @compat(UInt8(128))
 
 
 function contiguousbitcount(n::Integer,t=UInt32)
