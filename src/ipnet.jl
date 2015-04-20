@@ -5,8 +5,8 @@ IPv6broadcast = typemax(UInt128)
 # IPNet
 ##################################################
 
-width(::Type{IPv4}) = convert(UInt8,32)
-width(::Type{IPv6}) = convert(UInt8,128)
+width(::Type{IPv4}) = @compat UInt8(32)
+width(::Type{IPv6}) = @compat UInt8(128)
 
 
 function contiguousbitcount(n::Integer,t=UInt32)
@@ -23,7 +23,8 @@ function contiguousbitcount(n::Integer,t=UInt32)
     if !isinteger(bitct)
         error("noncontiguous bits")
     else
-        return uint8(sizeof(t)*8 - int(bitct))
+        bitct = @compat(floor(Int,bitct))
+        return @compat(UInt8(sizeof(t)*8 - bitct))
     end
 end
 
@@ -31,11 +32,11 @@ end
 function mask2bits(t::Type, n::Unsigned)
     # takes a number of 1's bits in a
     # netmask and returns an integer representation
-    maskbits = int(width(t)) - int(n)
+    maskbits = @compat(Int(width(t))) - @compat(Int(n))
     if maskbits < 0
         throw(BoundsError())
     else
-        return (~(uint128(2)^maskbits-1))
+        return (~(@compat(UInt128(2))^maskbits-1))
     end
 end
 
@@ -121,7 +122,7 @@ end
 
 
 # Vector look-alikes
-endof(net::IPNet) = uint128(length(net))
+endof(net::IPNet) = @compat(UInt128(length(net)))
 minimum(net::IPNet) = net[1]
 maximum(net::IPNet) = net[end]
 extrema(net::IPNet) = (minimum(net), maximum(net))
@@ -139,9 +140,9 @@ immutable IPv4Net <: IPNet
         if !(0 <= nmi <= width(IPv4))
             error("Invalid netmask")
         else
-            nm = uint8(nmi)
+            nm = @compat(UInt8(nmi))
             mask = mask2bits(IPv4, nm)
-            startip = uint32(na.host & mask)
+            startip = @compat(UInt32(na.host & mask))
             new(IPv4(startip),nm)
         end
     end
@@ -152,7 +153,7 @@ end
 function IPv4Net(ipmask::AbstractString)
     if search(ipmask,'/') > 0
         addrstr, netmaskstr = split(ipmask,"/")
-        netmask = uint8(netmaskstr)
+        netmask = @compat(parse(UInt8,netmaskstr))
     else
         addrstr = ipmask
         netmask = width(IPv4)
@@ -199,9 +200,9 @@ immutable IPv6Net <: IPNet
         if !(0 <= nmi <= width(IPv6))
             error("Invalid netmask")
         else
-            nm = uint8(nmi)
+            nm = @compat(UInt8(nmi))
             mask = mask2bits(IPv6, nm)
-            startip = uint128(na.host & mask)
+            startip = @compat(UInt128(na.host & mask))
             return new(IPv6(startip), nm)
         end
     end
@@ -212,7 +213,7 @@ end
 function IPv6Net(ipmask::AbstractString)
     if search(ipmask,'/') > 0
         addrstr, netmaskbits = split(ipmask,"/")
-        nmi = int(netmaskbits)
+        nmi = @compat(parse(Int,netmaskbits))
     else
         addrstr = ipmask
         nmi = width(IPv6)
