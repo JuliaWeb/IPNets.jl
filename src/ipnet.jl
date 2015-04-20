@@ -1,12 +1,12 @@
-IPv4broadcast = reinterpret(UInt32, int32(-1))
-IPv6broadcast = reinterpret(UInt128, int128(-1))
+IPv4broadcast = typemax(UInt32)
+IPv6broadcast = typemax(UInt128)
 
 ##################################################
 # IPNet
 ##################################################
 
-width(::Type{IPv4}) = uint8(32)
-width(::Type{IPv6}) = uint8(128)
+width(::Type{IPv4}) = convert(UInt8,32)
+width(::Type{IPv6}) = convert(UInt8,128)
 
 
 function contiguousbitcount(n::Integer,t=UInt32)
@@ -126,7 +126,7 @@ minimum(net::IPNet) = net[1]
 maximum(net::IPNet) = net[end]
 extrema(net::IPNet) = (minimum(net), maximum(net))
 getindex(net::IPNet, r::Range) = [net[i] for i in r]
-getindex(net::IPNet, i::(Integer,)) = getindex(net,i[1])
+# getindex(net::IPNet, i::(Integer,)) = getindex(net,i[1])
 start(net::IPNet) = net[1]
 next{T<:IPAddr}(net::IPNet, s::T) = s, T(s.host + 1)
 ##################################################
@@ -175,7 +175,7 @@ IPv4Net(ipaddr::Integer, netmask::Integer) = IPv4Net(IPv4(ipaddr), netmask)
 
 
 # "(x,y)"
-IPv4Net{A,M}(tuple::(A,M)) = IPv4Net(tuple[1],tuple[2])
+IPv4Net{A,M}(tuple::@compat(Tuple{A,M})) = IPv4Net(tuple[1],tuple[2])
 
 
 # "1.2.3.0", 24
@@ -235,4 +235,4 @@ IPv6Net(ipaddr::Integer, netmask::Integer) = IPv6Net(IPv6(ipaddr), netmask)
 
 
 # (123872, 128)
-IPv6Net{A,M}(tuple::(A,M)) = IPv6Net(tuple[1],tuple[2])
+IPv6Net{A,M}(tuple::@compat(Tuple{A,M})) = IPv6Net(tuple[1],tuple[2])
