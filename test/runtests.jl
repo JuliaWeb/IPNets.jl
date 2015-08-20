@@ -41,9 +41,9 @@ o5 = IPv6Net("2001:1::4/126")
 @test issubset(n3, n2) == true
 @test issubset(n1, n2) == true
 
-@test IPNets.contiguousbitcount(240,UInt8) == 0x04
-@test IPNets.contiguousbitcount(252,UInt8) == 0x06
-@test_throws ErrorException IPNets.contiguousbitcount(241,UInt8)
+@test IPNets._contiguousbitcount(240,UInt8) == 0x04
+@test IPNets._contiguousbitcount(252,UInt8) == 0x06
+@test_throws ErrorException IPNets._contiguousbitcount(241,UInt8)
 
 @test endswith(string(n5),"(\"1.2.3.4/30\")") == true
 @test endswith(sprint(print,n5),"(\"1.2.3.4/30\")") == true
@@ -59,7 +59,7 @@ o5 = IPv6Net("2001:1::4/126")
 # @test getindex(n5,(1,)) == ip41
 @test_throws BoundsError getindex(n5, 10)
 @test IPNets.width(IPv4) == 32
-@test_throws BoundsError IPNets.mask2bits(IPv4, @compat(UInt64(33)))
+@test_throws BoundsError IPNets._mask2bits(IPv4, @compat(UInt64(33)))
 
 
 
@@ -96,4 +96,4 @@ o5 = IPv6Net("2001:1::4/126")
 @test_throws BoundsError getindex(o5, 10)
 @test IPNets.width(IPv6) == 128
 
-@test_throws BoundsError IPNets.mask2bits(IPv6, @compat(UInt64(129)))
+@test_throws BoundsError IPNets._mask2bits(IPv6, @compat(UInt64(129)))
