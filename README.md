@@ -5,7 +5,7 @@
 [![IPNets](http://pkg.julialang.org/badges/IPNets_0.4.svg)](http://pkg.julialang.org/?pkg=IPNets&ver=nightly)
 
 *IPNets.jl* is a Julia package that provides IP network types. Both IPv4 and IPv6
-networks can be described using *IPNets.jl* using standard, intuitive syntax.
+networks can be described with *IPNets.jl* using standard, intuitive syntax.
 
 
 ### Main Features
