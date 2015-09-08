@@ -14,3 +14,4 @@ script:
   - julia --check-bounds=yes -e 'Pkg.clone(pwd()); Pkg.build("IPNets"); Pkg.test("IPNets"; coverage=true)'
 after_success:
   - julia -e 'cd(Pkg.dir("IPNets")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder()); Codecov.submit(process_folder())'
+
