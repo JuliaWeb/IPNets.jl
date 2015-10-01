@@ -9,7 +9,7 @@ import Base: show, string, start, next
 
 export
     # types
-    IPNet, IPv4Net, IPv6Net
+    IPNet, IPv4Net, IPv6Net, netmask
 
 
 IPv4broadcast = typemax(UInt32)
@@ -183,6 +183,9 @@ IPv4Net{A,M}(tuple::@compat(Tuple{A,M})) = IPv4Net(tuple[1],tuple[2])
 
 # "1.2.3.0", 24
 IPv4Net(netaddr::AbstractString, netmask::Integer) = IPv4Net(IPv4(netaddr), netmask)
+
+"""Returns the netmask as an IPv4 address"""
+netmask(n::IPv4Net) = IPv4(IPv4broadcast-2^(32-n.netmask)+1)
 
 
 ##################################################
