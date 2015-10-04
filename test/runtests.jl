@@ -97,3 +97,5 @@ o5 = IPv6Net("2001:1::4/126")
 @test IPNets.width(IPv6) == 128
 
 @test_throws BoundsError IPNets._mask2bits(IPv6, @compat(UInt64(129)))
+
+@test netmask(n1) == ip"255.255.255.0"
