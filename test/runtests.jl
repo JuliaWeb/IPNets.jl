@@ -103,4 +103,6 @@ o5 = IPv6Net("2001:1::4/126")
 @test eltype(o1) == IPv6
 
 @test n5[1] == ip41
+@test getindex(n5,1) == ip41
 @test o5[1] == ip61
+@test getindex(o5,1) == ip61
