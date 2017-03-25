@@ -1,11 +1,9 @@
-VERSION >= v"0.4.0-dev+6521" && __precompile__(true)
-
 module IPNets
-using Compat
-import Base: IPAddr, IPv4, IPv6, parseipv4, parseipv6
-import Base: length, size, endof, minimum, maximum, extrema, isless
-import Base: in, contains, issubset, getindex
-import Base: show, string, start, next
+
+import Base: IPAddr, IPv4, IPv6, eltype,
+length, size, endof, minimum, maximum, extrema, isless,
+in, contains, issubset, getindex,
+show, string, start, next, done
 
 export
     # types
@@ -15,45 +13,17 @@ export
 IPv4broadcast = typemax(UInt32)
 IPv6broadcast = typemax(UInt128)
 
+width(::Type{IPv4}) = UInt8(32)
+width(::Type{IPv6}) = UInt8(128)
+
 ##################################################
 # IPNet
 ##################################################
-
-width(::Type{IPv4}) = @compat(UInt8(32))
-width(::Type{IPv6}) = @compat(UInt8(128))
-
-function _contiguousbitcount(n::Integer,t=UInt32)
-    # takes an integer from 0 to 255 and a type, returns the number
-    # of contiguous 1 bits in the number assuming it's of that type,
-    # starting from the left.
-    # cbc(240,UInt8) == 0x04 ("1111 0000")
-    # cbc(252,UInt8) == 0x06 ("1111 1100")
-    # cbc(127,UInt8) == error ("0111 1111")
-
-    n = convert(t,n)
-    invn = ~n
-    bitct = log2(invn + 1)
-    isinteger(bitct) || error("noncontiguous bits")
-
-    bitct = @compat(floor(Int,bitct))
-    return @compat(UInt8(sizeof(t)*8 - bitct))
-end
-
-
-function _mask2bits(t::Type, n::Unsigned)
-    # takes a number of 1's bits in a
-    # netmask and returns an integer representation
-    maskbits = @compat(Int(width(t))) - @compat(Int(n))
-    maskbits < 0 && throw(BoundsError())
-
-    return (~(@compat(UInt128(2))^maskbits-1))
-end
-
+abstract IPNet
 
 ##################################################
 # Network representations
 ##################################################
-abstract IPNet
 
 """Returns the size of an IP network (# of hosts) as a tuple.
 """
@@ -123,19 +93,20 @@ function getindex(net::IPNet, i::Integer)
 end
 
 
-# Vector look-alikes
-endof(net::IPNet) = @compat(UInt128(length(net)))
 minimum(net::IPNet) = net[1]
 maximum(net::IPNet) = net[end]
 extrema(net::IPNet) = (minimum(net), maximum(net))
+getindex{T<:IPNet}(net::T, i) = net[i]
 getindex(net::IPNet, r::Range) = [net[i] for i in r]
 # getindex(net::IPNet, i::(Integer,)) = getindex(net,i[1])
 start(net::IPNet) = net[1]
 next{T<:IPAddr}(net::IPNet, s::T) = s, T(s.host + 1)
+done{T<:IPAddr}(net::IPNet, s::T) = s > net[end]
+
+
 ##################################################
 # IPv4
 ##################################################
-
 """Type representing an IPv4 network"""
 immutable IPv4Net <: IPNet
     netaddr::IPv4
@@ -143,9 +114,9 @@ immutable IPv4Net <: IPNet
     function IPv4Net(na::IPv4, nmi::Integer)
         (0 <= nmi <= width(IPv4)) || error("Invalid netmask")
 
-        nm = @compat(UInt8(nmi))
+        nm = UInt8(nmi)
         mask = _mask2bits(IPv4, nm)
-        startip = @compat(UInt32(na.host & mask))
+        startip = UInt32(na.host & mask)
         new(IPv4(startip),nm)
     end
 end
@@ -155,7 +126,7 @@ end
 function IPv4Net(ipmask::AbstractString)
     if search(ipmask,'/') > 0
         addrstr, netmaskstr = split(ipmask,"/")
-        netmask = @compat(parse(UInt8,netmaskstr))
+        netmask = parse(UInt8,netmaskstr)
     else
         addrstr = ipmask
         netmask = width(IPv4)
@@ -172,14 +143,11 @@ function IPv4Net(netaddr::AbstractString, netmask::AbstractString)
     return IPv4Net(netaddr, netmask)
 end
 
-
 # 123872, 24
 IPv4Net(ipaddr::Integer, netmask::Integer) = IPv4Net(IPv4(ipaddr), netmask)
 
-
 # "(x,y)"
-IPv4Net{A,M}(tuple::@compat(Tuple{A,M})) = IPv4Net(tuple[1],tuple[2])
-
+IPv4Net{A,M}(tuple::Tuple{A,M}) = IPv4Net(tuple[1],tuple[2])
 
 # "1.2.3.0", 24
 IPv4Net(netaddr::AbstractString, netmask::Integer) = IPv4Net(IPv4(netaddr), netmask)
@@ -187,6 +155,8 @@ IPv4Net(netaddr::AbstractString, netmask::Integer) = IPv4Net(IPv4(netaddr), netm
 """Returns the netmask as an IPv4 address"""
 netmask(n::IPv4Net) = IPv4(IPv4broadcast-2^(32-n.netmask)+1)
 
+eltype(x::IPv4Net) = IPv4
+endof(net::IPv4Net) = UInt32(length(net))
 
 ##################################################
 # IPv6
@@ -205,9 +175,9 @@ immutable IPv6Net <: IPNet
     function IPv6Net(na::IPv6, nmi::Integer)
         (0 <= nmi <= width(IPv6)) || error("Invalid netmask")
 
-        nm = @compat(UInt8(nmi))
+        nm = UInt8(nmi)
         mask = _mask2bits(IPv6, nm)
-        startip = @compat(UInt128(na.host & mask))
+        startip = UInt128(na.host & mask)
         return new(IPv6(startip), nm)
     end
 end
@@ -217,7 +187,7 @@ end
 function IPv6Net(ipmask::AbstractString)
     if search(ipmask,'/') > 0
         addrstr, netmaskbits = split(ipmask,"/")
-        nmi = @compat(parse(Int,netmaskbits))
+        nmi = parse(Int,netmaskbits)
     else
         addrstr = ipmask
         nmi = width(IPv6)
@@ -240,6 +210,38 @@ IPv6Net(ipaddr::Integer, netmask::Integer) = IPv6Net(IPv6(ipaddr), netmask)
 
 
 # (123872, 128)
-IPv6Net{A,M}(tuple::@compat(Tuple{A,M})) = IPv6Net(tuple[1],tuple[2])
+IPv6Net{A,M}(tuple::Tuple{A,M}) = IPv6Net(tuple[1],tuple[2])
 
+eltype(x::IPv6Net) = IPv6
+endof(net::IPv6Net) = UInt128(length(net))
+
+
+### Helper functions
+function _contiguousbitcount(n::Integer,t=UInt32)
+    # takes an integer from 0 to 255 and a type, returns the number
+    # of contiguous 1 bits in the number assuming it's of that type,
+    # starting from the left.
+    # cbc(240,UInt8) == 0x04 ("1111 0000")
+    # cbc(252,UInt8) == 0x06 ("1111 1100")
+    # cbc(127,UInt8) == error ("0111 1111")
+
+    n = convert(t,n)
+    invn = ~n
+    bitct = log2(invn + 1)
+    isinteger(bitct) || error("noncontiguous bits")
+
+    bitct = floor(Int,bitct)
+    return UInt8(sizeof(t)*8 - bitct)
 end
+
+
+function _mask2bits(t::Type, n::Unsigned)
+    # takes a number of 1's bits in a
+    # netmask and returns an integer representation
+    maskbits = Int(width(t)) - Int(n)
+    maskbits < 0 && throw(BoundsError())
+
+    return (~(UInt128(2)^maskbits-1))
+end
+
+end # module
