@@ -1,8 +1,13 @@
 ## IPNets.jl
 [![Build Status](https://travis-ci.org/JuliaWeb/IPNets.jl.svg?branch=master)](https://travis-ci.org/JuliaWeb/IPNets.jl)
-[![Coverage Status](https://img.shields.io/coveralls/JuliaWeb/IPNets.jl.svg)](https://coveralls.io/r/JuliaWeb/IPNets.jl?branch=master)
-[![IPNets](http://pkg.julialang.org/badges/IPNets_0.3.svg)](http://pkg.julialang.org/?pkg=IPNets&ver=0.3)
+[![codecov.io](http://codecov.io/github/JuliaWeb/IPNets.jl/coverage.svg?branch=master)](http://codecov.io/github/JuliaWeb/IPNets.jl?branch=master)
+[![](https://img.shields.io/badge/docs-latest-blue.svg)](https://juliagraphs.github.io/IPNets.jl/latest)
+[![Join the chat at https://gitter.im/JuliaWeb/IPNets.jl](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/JuliaWeb/IPNets.jl)
+
+[![IPNets](http://pkg.julialang.org/badges/IPNets_0.3.svg)](http://pkg.julialang.org/?pkg=IPNets)
 [![IPNets](http://pkg.julialang.org/badges/IPNets_0.4.svg)](http://pkg.julialang.org/?pkg=IPNets&ver=0.4)
+[![IPNets](http://pkg.julialang.org/badges/IPNets_0.5.svg)](http://pkg.julialang.org/?pkg=IPNets)
+[![IPNets](http://pkg.julialang.org/badges/IPNets_0.6.svg)](http://pkg.julialang.org/?pkg=IPNets)
 
 *IPNets.jl* is a Julia package that provides IP network types. Both IPv4 and IPv6
 networks can be described with *IPNets.jl* using standard, intuitive syntax.
