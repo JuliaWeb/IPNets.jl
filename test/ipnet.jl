@@ -1,6 +1,5 @@
 using IPNets
 using Base.Test
-using Compat
 
 ip41 = IPv4("1.2.3.4")
 ip42 = IPv4("5.6.7.8")
@@ -59,7 +58,7 @@ o5 = IPv6Net("2001:1::4/126")
 # @test getindex(n5,(1,)) == ip41
 @test_throws BoundsError getindex(n5, 10)
 @test IPNets.width(IPv4) == 32
-@test_throws BoundsError IPNets.mask2bits(IPv4, @compat(UInt64(33)))
+@test_throws BoundsError IPNets.mask2bits(IPv4, UInt64(33))
 
 
 
