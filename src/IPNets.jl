@@ -97,7 +97,7 @@ end
 minimum(net::IPNet) = net[1]
 maximum(net::IPNet) = net[end]
 extrema(net::IPNet) = (minimum(net), maximum(net))
-getindex{T<:IPNet}(net::T, i) = net[i]
+getindex(net::IPNet, i) = net[i]
 getindex(net::IPNet, r::Range) = [net[i] for i in r]
 # getindex(net::IPNet, i::(Integer,)) = getindex(net,i[1])
 start(net::IPNet) = net[1]
