@@ -1,3 +1,4 @@
+__precompile__(true)
 module IPNets
 
 import Base: IPAddr, IPv4, IPv6, eltype,

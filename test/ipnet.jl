@@ -95,4 +95,4 @@ o5 = IPv6Net("2001:1::4/126")
 @test_throws BoundsError getindex(o5, 10)
 @test IPNets.width(IPv6) == 128
 
-@test_throws BoundsError IPNets.mask2bits(IPv6, @compat(UInt64(129)))
+@test_throws BoundsError IPNets.mask2bits(IPv6, UInt64(129))
