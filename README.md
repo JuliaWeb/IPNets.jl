@@ -103,7 +103,7 @@ julia> size(a)
 
 Though these examples use the `IPv4Net` type, the `IPv6Net` type is also available with similar behavior.
 
-###Known Issues
+### Known Issues
 - Extrema measurements for `IPNets` representing the entire IPv4 or IPv6 address
 space will fail due to overrun of the native type used to describe the networks.
 - Non-contiguous subnetting for IPv4 addresses (e.g., a netmask of "255.240.255.0")
