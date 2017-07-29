@@ -20,7 +20,7 @@ width(::Type{IPv6}) = UInt8(128)
 ##################################################
 # IPNet
 ##################################################
-abstract IPNet
+abstract type IPNet end
 
 ##################################################
 # Network representations
@@ -45,24 +45,17 @@ function string(net::IPNet)
     return s
 end
 
-function show(io::IO, net::IPNet)
-    print(io, string(net))
-end
-
+show(io::IO, net::IPNet) = print(io, string(net))
 
 # IP Networks are ordered first by starting network address
 # and then by network mask. That is, smaller IP nets (with higher
 # netmask values) are "less" than larger ones. This corresponds
 # to secondary reordering by ending address.
-function isless{T<:IPNet}(a::T, b::T)
-    if a.netaddr == b.netaddr
-        return isless(b.netmask, a.netmask)
-    else
-        return isless(a.netaddr, b.netaddr)
-    end
-end
+isless(a::T, b::T) where T <: IPNet = a.netaddr == b.netaddr ?
+        isless(b.netmask, a.netmask) :
+        isless(a.netaddr, b.netaddr)
 
-function issubset{T<:IPNet}(a::T, b::T)
+function issubset(a::T, b::T) where T <: IPNet
     astart, aend = extrema(a)
     bstart, bend = extrema(b)
     return (bstart <= astart <= aend <= bend)
@@ -72,7 +65,6 @@ end
 function in(ipaddr::IPAddr, net::IPNet)
     typeof(net.netaddr) == typeof(ipaddr) ||
         error("IPAddr is not the same type as IPNet")
-
     netstart = net.netaddr.host
     numbits = width(typeof(ipaddr)) - net.netmask
     netend = net.netaddr.host + big(2)^numbits - 1
@@ -80,13 +72,9 @@ function in(ipaddr::IPAddr, net::IPNet)
 end
 
 """Membership test for an IP address within an IP network"""
-function contains(net::IPNet, ipaddr::IPAddr)
-    return in(ipaddr, net)
-end
-
+contains(net::IPNet, ipaddr::IPAddr) = in(ipaddr, net)
 
 function getindex(net::IPNet, i::Integer)
-
     t = typeof(net.netaddr)
     ip = t(net.netaddr.host + i - 1)
     ip in net || throw(BoundsError())
@@ -97,12 +85,10 @@ end
 minimum(net::IPNet) = net[1]
 maximum(net::IPNet) = net[end]
 extrema(net::IPNet) = (minimum(net), maximum(net))
-getindex(net::IPNet, i) = net[i]
 getindex(net::IPNet, r::Range) = [net[i] for i in r]
-# getindex(net::IPNet, i::(Integer,)) = getindex(net,i[1])
 start(net::IPNet) = net[1]
-next{T<:IPAddr}(net::IPNet, s::T) = s, T(s.host + 1)
-done{T<:IPAddr}(net::IPNet, s::T) = s > net[end]
+next(net::IPNet, s::T) where T <: IPAddr = s, T(s.host + 1)
+done(net::IPNet, s::T) where T <: IPAddr = s > net[end]
 
 
 ##################################################
@@ -127,7 +113,7 @@ end
 function IPv4Net(ipmask::AbstractString)
     if search(ipmask,'/') > 0
         addrstr, netmaskstr = split(ipmask,"/")
-        netmask = parse(UInt8,netmaskstr)
+        netmask = parse(UInt8, netmaskstr)
     else
         addrstr = ipmask
         netmask = width(IPv4)
@@ -148,7 +134,7 @@ end
 IPv4Net(ipaddr::Integer, netmask::Integer) = IPv4Net(IPv4(ipaddr), netmask)
 
 # "(x,y)"
-IPv4Net{A,M}(tuple::Tuple{A,M}) = IPv4Net(tuple[1],tuple[2])
+IPv4Net(tuple::Tuple{A,M}) where A where M = IPv4Net(tuple[1],tuple[2])
 
 # "1.2.3.0", 24
 IPv4Net(netaddr::AbstractString, netmask::Integer) = IPv4Net(IPv4(netaddr), netmask)
@@ -211,7 +197,7 @@ IPv6Net(ipaddr::Integer, netmask::Integer) = IPv6Net(IPv6(ipaddr), netmask)
 
 
 # (123872, 128)
-IPv6Net{A,M}(tuple::Tuple{A,M}) = IPv6Net(tuple[1],tuple[2])
+IPv6Net(t::Tuple{A,M}) where A where M = IPv6Net(t[1],t[2])
 
 eltype(x::IPv6Net) = IPv6
 endof(net::IPv6Net) = UInt128(length(net))
