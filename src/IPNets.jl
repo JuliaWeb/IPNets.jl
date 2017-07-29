@@ -1,6 +1,8 @@
 __precompile__(true)
 module IPNets
 
+using Compat
+
 import Base: IPAddr, IPv4, IPv6, eltype,
 length, size, endof, minimum, maximum, extrema, isless,
 in, contains, issubset, getindex,
@@ -20,7 +22,7 @@ width(::Type{IPv6}) = UInt8(128)
 ##################################################
 # IPNet
 ##################################################
-abstract IPNet
+@compat abstract type IPNet end
 
 ##################################################
 # Network representations
