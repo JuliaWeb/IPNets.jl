@@ -95,7 +95,7 @@ done(net::IPNet, s::T) where T <: IPAddr = s > net[end]
 # IPv4
 ##################################################
 """Type representing an IPv4 network"""
-immutable IPv4Net <: IPNet
+struct IPv4Net <: IPNet
     netaddr::IPv4
     netmask::UInt8
     function IPv4Net(na::IPv4, nmi::Integer)
@@ -150,7 +150,7 @@ endof(net::IPv4Net) = UInt32(length(net))
 ##################################################
 
 """Type representing an IPv6 network"""
-immutable IPv6Net <: IPNet
+struct IPv6Net <: IPNet
     # we treat the netmask as a potentially noncontiguous bitmask
     # for speed of calculation and consistency, but RFC2373, section
     # 2 provides for contiguous bitmasks only. We validate this
