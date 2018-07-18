@@ -101,7 +101,15 @@ julia> size(a)
 (4294967296,)
 ```
 
-Though these examples use the `IPv4Net` type, the `IPv6Net` type is also available with similar behavior.
+Though these examples use the `IPv4Net` type, the `IPv6Net` type is also available with similar behavior:
+```
+julia> IPNet("1.2.3.0/24")
+IPNets.IPv4Net("1.2.3.0/24")
+
+julia> IPNet("2001:1::/64")
+IPNets.IPv6Net("2001:1::/64")
+```
+
 
 ### Known Issues
 - Extrema measurements for `IPNets` representing the entire IPv4 or IPv6 address

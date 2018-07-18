@@ -60,6 +60,7 @@ using Base.Test
         @test eltype(n1) == IPv4
         @test n5[1] == ip41
         @test getindex(n5,1) == ip41
+        @test IPNet("1.2.3.0/24") == n1
     end
 
     # IPv6
@@ -96,5 +97,6 @@ using Base.Test
         @test eltype(o1) == IPv6
         @test o5[1] == ip61
         @test getindex(o5,1) == ip61
+        @test IPNet("2001:1::/64") == o1
     end
 end
