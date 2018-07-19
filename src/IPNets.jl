@@ -1,15 +1,17 @@
 __precompile__(true)
 module IPNets
 
-import Base: IPAddr, IPv4, IPv6, eltype,
-length, size, endof, minimum, maximum, extrema, isless,
+import Base: eltype,
+length, size, minimum, maximum, extrema, isless,
 in, contains, issubset, getindex,
 show, string, start, next, done
+
+import Compat: AbstractRange, lastindex, something
+import Compat.Sockets: IPAddr, IPv4, IPv6, @ip_str
 
 export
     # types
     IPNet, IPv4Net, IPv6Net, netmask
-
 
 IPv4broadcast = typemax(UInt32)
 IPv6broadcast = typemax(UInt128)
@@ -85,7 +87,7 @@ end
 minimum(net::IPNet) = net[1]
 maximum(net::IPNet) = net[end]
 extrema(net::IPNet) = (minimum(net), maximum(net))
-getindex(net::IPNet, r::Range) = [net[i] for i in r]
+getindex(net::IPNet, r::AbstractRange) = [net[i] for i in r]
 start(net::IPNet) = net[1]
 next(net::IPNet, s::T) where T <: IPAddr = s, T(s.host + 1)
 done(net::IPNet, s::T) where T <: IPAddr = s > net[end]
@@ -111,7 +113,7 @@ end
 
 # "1.2.3.0/24"
 function IPv4Net(ipmask::AbstractString)
-    if search(ipmask,'/') > 0
+    if something(findfirst(isequal('/'), ipmask), 0) > 0
         addrstr, netmaskstr = split(ipmask,"/")
         netmask = parse(UInt8, netmaskstr)
     else
@@ -143,7 +145,7 @@ IPv4Net(netaddr::AbstractString, netmask::Integer) = IPv4Net(IPv4(netaddr), netm
 netmask(n::IPv4Net) = IPv4(IPv4broadcast-2^(32-n.netmask)+1)
 
 eltype(x::IPv4Net) = IPv4
-endof(net::IPv4Net) = UInt32(length(net))
+lastindex(net::IPv4Net) = UInt32(length(net))
 
 ##################################################
 # IPv6
@@ -172,7 +174,7 @@ end
 
 # "2001::1/64"
 function IPv6Net(ipmask::AbstractString)
-    if search(ipmask,'/') > 0
+    if something(findfirst(isequal('/'), ipmask), 0) > 0
         addrstr, netmaskbits = split(ipmask,"/")
         nmi = parse(Int,netmaskbits)
     else
@@ -200,7 +202,7 @@ IPv6Net(ipaddr::Integer, netmask::Integer) = IPv6Net(IPv6(ipaddr), netmask)
 IPv6Net(t::Tuple{A,M}) where A where M = IPv6Net(t[1],t[2])
 
 eltype(x::IPv6Net) = IPv6
-endof(net::IPv6Net) = UInt128(length(net))
+lastindex(net::IPv6Net) = UInt128(length(net))
 
 
 ### Helper functions
