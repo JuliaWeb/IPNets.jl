@@ -1,5 +1,6 @@
 using IPNets
-using Base.Test
+using Test
+import Sockets: IPAddr, IPv4, IPv6, @ip_str
 
 @testset "IPNets" begin
     ip41 = IPv4("1.2.3.4")
@@ -47,7 +48,7 @@ using Base.Test
         @test endswith(string(display,n5),"(\"1.2.3.4/30\")") == true
         @test size(n5) == (4,)
         @test [x for x in n5] == [ip"1.2.3.4", ip"1.2.3.5", ip"1.2.3.6", ip"1.2.3.7"]
-        @test endof(n5) == 4
+        @test lastindex(n5) == 4
         @test minimum(n5) == ip"1.2.3.4"
         @test maximum(n5) == ip"1.2.3.7"
         @test extrema(n5) == (ip"1.2.3.4",ip"1.2.3.7")
@@ -85,7 +86,7 @@ using Base.Test
         @test endswith(string(display,o5),"(\"2001:1::4/126\")") == true
         @test size(o5) == (4,)
         @test [x for x in o5] == [ip"2001:1::4",ip"2001:1::5",ip"2001:1::6",ip"2001:1::7"]
-        @test endof(o5) == 4
+        @test lastindex(o5) == 4
         @test minimum(o5) == ip"2001:1::4"
         @test maximum(o5) == ip"2001:1::7"
         @test extrema(o5) == (ip"2001:1::4",ip"2001:1::7")

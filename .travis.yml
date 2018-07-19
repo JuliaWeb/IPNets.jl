@@ -3,13 +3,10 @@ sudo: false
 os:
   - linux
 #  - osx
-julia:
- - 0.6
- - nightly
 
-matrix:
-  allow_failures:
-    - julia: nightly
+# TODO: Replace with 0.7 once released
+julia:
+ - nightly
 
 notifications:
   email: false
