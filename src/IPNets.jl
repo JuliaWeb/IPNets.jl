@@ -1,13 +1,12 @@
 __precompile__(true)
 module IPNets
 
-import Base: eltype,
+import Base: eltype, lastindex,
 length, size, minimum, maximum, extrema, isless,
 in, contains, issubset, getindex,
 show, string, start, next, done
 
-import Compat: AbstractRange, lastindex, something
-import Compat.Sockets: IPAddr, IPv4, IPv6, @ip_str
+import Sockets: IPAddr, IPv4, IPv6, @ip_str
 
 export
     # types

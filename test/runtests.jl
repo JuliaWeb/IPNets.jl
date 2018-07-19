@@ -1,8 +1,6 @@
 using IPNets
-using Compat.Test
-
-import Compat: lastindex
-import Compat.Sockets: IPAddr, IPv4, IPv6, @ip_str
+using Test
+import Sockets: IPAddr, IPv4, IPv6, @ip_str
 
 @testset "IPNets" begin
     ip41 = IPv4("1.2.3.4")
