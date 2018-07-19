@@ -22,6 +22,8 @@ width(::Type{IPv6}) = UInt8(128)
 ##################################################
 abstract type IPNet end
 
+IPNet(ipmask::AbstractString) = ':' in ipmask ? IPv6Net(ipmask) : IPv4Net(ipmask)
+
 ##################################################
 # Network representations
 ##################################################
