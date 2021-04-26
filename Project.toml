@@ -1,0 +1,15 @@
+name = "IPNets"
+uuid = "66763231-799b-5fff-8662-389acfc33a85"
+version = "1.0.0"
+
+[deps]
+Sockets = "6462fe0b-24de-5631-8697-dd941f90decc"
+
+[compat]
+julia = "1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
