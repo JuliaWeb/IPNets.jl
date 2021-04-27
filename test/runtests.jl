@@ -1,103 +1,129 @@
-using IPNets
-using Test
-import Sockets: IPAddr, IPv4, IPv6, @ip_str
+using IPNets, Test, Sockets
 
 @testset "IPNets" begin
-    ip41 = IPv4("1.2.3.4")
-    ip42 = IPv4("5.6.7.8")
+    #############
+    ## IPv4Net ##
+    #############
 
-    n1 = IPv4Net("1.2.3.0/24")
-    n2 = IPv4Net("1.2.3.4/24")
-    n3 = IPv4Net("1.2.3.4/26")
-    n4 = IPv4Net("5.6.7.0/24")
-    n5 = IPv4Net("1.2.3.4/30")
+    ## Constructors
+    @test IPv4Net("1.2.3.4") == parse(IPv4Net, "1.2.3.4") ==
+          IPv4Net("1.2.3.4/32") == parse(IPv4Net, "1.2.3.4/32") ==
+          IPv4Net(ip"1.2.3.4") == IPv4Net(ip"1.2.3.4", 32) ==
+          IPv4Net(ip"1.2.3.4", ip"255.255.255.255") ==
+          IPNet("1.2.3.4") == IPNet("1.2.3.4/32") ==
+          parse(IPNet, "1.2.3.4") == parse(IPNet, "1.2.3.4/32") ==
+          IPv4Net(0x01020304, typemax(UInt32))
+    @test IPv4Net("1.2.3.0/24") == parse(IPv4Net, "1.2.3.0/24") ==
+          IPv4Net(ip"1.2.3.0", ip"255.255.255.0") ==
+          IPv4Net(ip"1.2.3.0", 24) == parse(IPNet, "1.2.3.0/24") ==
+          IPv4Net(0x01020300, typemax(UInt32) << 8)
 
-    ip61 = IPv6("2001:1::4")
-    ip62 = IPv6("2001:2::8")
+    err = ArgumentError("network mask bits must be between 0 and 32, got 33")
+    @test_throws err IPv4Net("1.2.3.4/33")
+    @test_throws err IPv4Net(ip"1.2.3.4", 33)
+    err = ArgumentError("non-contiguous IPv4 subnets not supported, got 255.240.255.0")
+    @test_throws err IPv4Net(ip"1.2.3.0", ip"255.240.255.0")
+    err = ArgumentError("input 1.2.3.4/24 has host bits set")
+    @test_throws err IPv4Net("1.2.3.4/24")
+    @test_throws err parse(IPv4Net, "1.2.3.4/24")
+    @test_throws err IPv4Net(ip"1.2.3.4", 24)
+    @test_throws err parse(IPNet, "1.2.3.4/24")
+    err = ArgumentError("malformed IPNet input: 1.2.3.4/32/32")
+    @test_throws err IPv4Net("1.2.3.4/32/32")
 
-    o1 = IPv6Net("2001:1::/64")
-    o2 = IPv6Net("2001:1::4/64")
-    o3 = IPv6Net("2001:1::4/68")
-    o4 = IPv6Net("2001:2::8/64")
-    o5 = IPv6Net("2001:1::4/126")
+    ## Print
+    ipnet = IPv4Net("1.2.3.0/24")
+    @test sprint(print, ipnet) == "1.2.3.0/24"
+    @test sprint(show, ipnet) == "IPv4Net(\"1.2.3.0/24\")"
 
-    # ipv4
-    @testset "IPv4" begin
-        @test_throws ErrorException IPv4Net(ip41, 33)
-        @test IPv4Net("1.2.3.4", "255.255.255.0") == n1
-        @test IPv4Net("1.2.3.4", 24) == n1
-        @test IPv4Net(16909060,24) == n1
-        @test IPv4Net((16909060,24)) == n1
-        @test IPv4Net("1.2.3.4") == IPv4Net("1.2.3.4/32")
-        @test n1 == n2
-        @test isless(n1,n3) == false
-        @test isless(n1,n4) == true
-        @test n1[5] == ip41
-        @test isless(ip41, ip42) == true
-        @test in(ip42, n4) == true
-        @test_throws ErrorException ip42 in o4
-        @test contains(n4, ip42) == true
-        @test issubset(n3, n2) == true
-        @test issubset(n1, n2) == true
-        @test IPNets._contiguousbitcount(240,UInt8) == 0x04
-        @test IPNets._contiguousbitcount(252,UInt8) == 0x06
-        @test_throws ErrorException IPNets._contiguousbitcount(241,UInt8)
-        @test endswith(string(n5),"(\"1.2.3.4/30\")") == true
-        @test endswith(sprint(print,n5),"(\"1.2.3.4/30\")") == true
-        @test endswith(sprint(show,n5),"(\"1.2.3.4/30\")") == true
-        @test endswith(string(display,n5),"(\"1.2.3.4/30\")") == true
-        @test size(n5) == (4,)
-        @test [x for x in n5] == [ip"1.2.3.4", ip"1.2.3.5", ip"1.2.3.6", ip"1.2.3.7"]
-        @test lastindex(n5) == 4
-        @test minimum(n5) == ip"1.2.3.4"
-        @test maximum(n5) == ip"1.2.3.7"
-        @test extrema(n5) == (ip"1.2.3.4",ip"1.2.3.7")
-        @test getindex(n5,1:2) == [ip"1.2.3.4", ip"1.2.3.5"]
-        # @test getindex(n5,(1,)) == ip41
-        @test_throws BoundsError getindex(n5, 10)
-        @test IPNets.width(IPv4) == 32
-        @test_throws BoundsError IPNets._mask2bits(IPv4, UInt64(33))
-        @test netmask(n1) == ip"255.255.255.0"
-        @test eltype(n1) == IPv4
-        @test n5[1] == ip41
-        @test getindex(n5,1) == ip41
-        @test IPNet("1.2.3.0/24") == n1
-    end
 
-    # IPv6
-    @testset "IPv6" begin
-        @test_throws ErrorException IPv6Net(ip61, 129)
-        @test IPv6Net("2001:1::", 64) == o1
-        @test IPv6Net(0x20010001000000000000000000000004,64) == o1
-        @test IPv6Net((0x20010001000000000000000000000004,64)) == o1
-        @test o1 == o2
+    ## IPNet as collection
+    ipnet = IPv4Net("1.2.3.0/24")
 
-        @test IPv6Net("2001:1::1") == IPv6Net("2001:1::1/128")
-        @test isless(o1,o3) == false
-        @test isless(o1,o4) == true
-        @test o1[5] == ip61
-        @test isless(ip61, ip62) == true
-        @test in(ip62, o4) == true
-        @test_throws ErrorException ip62 in n4
-        @test contains(o4, ip62) == true
-        @test endswith(string(o5),"(\"2001:1::4/126\")") == true
-        @test endswith(sprint(print,o5),"(\"2001:1::4/126\")") == true
-        @test endswith(sprint(show,o5),"(\"2001:1::4/126\")") == true
-        @test endswith(string(display,o5),"(\"2001:1::4/126\")") == true
-        @test size(o5) == (4,)
-        @test [x for x in o5] == [ip"2001:1::4",ip"2001:1::5",ip"2001:1::6",ip"2001:1::7"]
-        @test lastindex(o5) == 4
-        @test minimum(o5) == ip"2001:1::4"
-        @test maximum(o5) == ip"2001:1::7"
-        @test extrema(o5) == (ip"2001:1::4",ip"2001:1::7")
-        @test getindex(o5,1:2) == [ip"2001:1::4", ip"2001:1::5"]
-        # @test getindex(o5,(1,)) == ip61
-        @test_throws BoundsError getindex(o5, 10)
-        @test IPNets.width(IPv6) == 128
-        @test_throws BoundsError IPNets._mask2bits(IPv6, UInt64(129))
-        @test eltype(o1) == IPv6
-        @test o5[1] == ip61
-        @test getindex(o5,1) == ip61
-        @test IPNet("2001:1::/64") == o1
-    end
+    @test ip"1.2.3.4" in ipnet
+    @test ip"1.2.3.0" in ipnet
+    @test ip"1.2.3.255" in ipnet
+    @test !(ip"1.2.4.0" in ipnet)
+
+    @test IPv4Net("1.2.3.4/32") == IPv4Net("1.2.3.4/32")
+    @test IPv4Net("1.2.3.0/24") == IPv4Net("1.2.3.0/24")
+    @test IPv4Net("1.2.3.4/32") != IPv4Net("1.2.3.4/31")
+    @test IPv4Net("1.2.3.4/31") < IPv4Net("1.2.3.4/32")
+    @test IPv4Net("1.2.3.4/32") > IPv4Net("1.2.3.4/31")
+    @test IPv4Net("1.2.3.0/24") < IPv4Net("1.2.4.0/24")
+    @test IPv4Net("1.2.4.0/24") > IPv4Net("1.2.3.0/24")
+    nets = map(IPv4Net, ["1.2.3.0/24", "1.2.3.4/31", "1.2.3.4/32", "1.2.4.0/24"])
+    @test sort(nets) == nets
+
+    @test length(ipnet) == length(collect(ipnet)) == 256
+    @test collect(ipnet) == [x for x in ipnet]
+    @test length(IPv4Net("0.0.0.0/0"))::Int64 == Int64(1) << 32
+    @test ipnet[0] == #= ipnet[begin] == =# ip"1.2.3.0" # TODO: Requires Julia 1.4
+    @test ipnet[1] == ip"1.2.3.1"
+    @test ipnet[255] == ipnet[end] == ip"1.2.3.255"
+    @test ipnet[0:1] == ipnet[[0, 1]] == [ip"1.2.3.0", ip"1.2.3.1"]
+    @test_throws BoundsError ipnet[-1]
+    @test_throws BoundsError ipnet[256]
+    @test_throws BoundsError ipnet[-1:2]
+
+
+    #############
+    ## IPv6Net ##
+    #############
+
+    ## Constructors
+    @test IPv6Net("1:2::3:4") == parse(IPv6Net, "1:2::3:4") ==
+          IPv6Net("1:2::3:4/128") == parse(IPv6Net, "1:2::3:4/128") ==
+          IPv6Net(ip"1:2::3:4") == IPv6Net(ip"1:2::3:4", 128) ==
+          parse(IPNet, "1:2::3:4") == parse(IPNet, "1:2::3:4/128") ==
+          IPv6Net(0x00010002000000000000000000030004, typemax(UInt128))
+    @test IPv6Net("1:2::3:0/112") == parse(IPv6Net, "1:2::3:0/112") ==
+          IPv6Net(ip"1:2::3:0", 112) == parse(IPNet, "1:2::3:0/112") ==
+          IPv6Net(0x00010002000000000000000000030000, typemax(UInt128) << 16)
+
+    err = ArgumentError("network mask bits must be between 0 and 128, got 129")
+    @test_throws err IPv6Net("1:2::3:4/129")
+    @test_throws err IPv6Net(ip"1:2::3:4", 129)
+    err = ArgumentError("input 1:2::3:4/112 has host bits set")
+    @test_throws err IPv6Net("1:2::3:4/112")
+    @test_throws err parse(IPv6Net, "1:2::3:4/112")
+    @test_throws err IPv6Net(ip"1:2::3:4", 112)
+    @test_throws err parse(IPNet, "1:2::3:4/112")
+    err = ArgumentError("malformed IPNet input: 1:2::3:4/32/32")
+    @test_throws err IPv6Net("1:2::3:4/32/32")
+
+    ## Print
+    ipnet = IPv6Net("1:2::3:0/112")
+    @test sprint(print, ipnet) == "1:2::3:0/112"
+    @test sprint(show, ipnet) == "IPv6Net(\"1:2::3:0/112\")"
+
+
+    ## IPNet as collection
+    ipnet = IPv6Net("1:2::3:0/112")
+
+    @test ip"1:2::3:4" in ipnet
+    @test ip"1:2::3:0" in ipnet
+    @test ip"1:2::3:ffff" in ipnet
+    @test !(ip"1:2::4:0" in ipnet)
+
+    @test IPv6Net("1:2::3:4/128") == IPv6Net("1:2::3:4/128")
+    @test IPv6Net("1:2::3:0/112") == IPv6Net("1:2::3:0/112")
+    @test IPv6Net("1:2::3:4/128") != IPv6Net("1:2::3:4/127")
+    @test IPv6Net("1:2::3:4/127") < IPv6Net("1:2::3:4/128")
+    @test IPv6Net("1:2::3:4/128") > IPv6Net("1:2::3:4/127")
+    @test IPv6Net("1:2::3:0/112") < IPv6Net("1:2::4:0/112")
+    @test IPv6Net("1:2::4:0/112") > IPv6Net("1:2::3:0/112")
+    nets = map(IPv6Net, ["1:2::3:0/112", "1:2::3:4/127", "1:2::3:4/128", "1:2::4:0/112"])
+    @test sort(nets) == nets
+
+    @test length(ipnet) == length(collect(ipnet)) == 65536
+    @test collect(ipnet)::Vector{IPv6} == [x for x in ipnet]
+    @test length(IPv6Net("::/0"))::BigInt == BigInt(1) << 128
+    @test ipnet[0] == #= ipnet[begin] == =# ip"1:2::3:0" # TODO: Requires Julia 1.4
+    @test ipnet[1] == ip"1:2::3:1"
+    @test ipnet[65535] == ipnet[end] == ip"1:2::3:ffff"
+    @test ipnet[0:1] == ipnet[[0, 1]] == [ip"1:2::3:0", ip"1:2::3:1"]
+    @test_throws BoundsError ipnet[-1]
+    @test_throws BoundsError ipnet[65536]
+    @test_throws BoundsError ipnet[-1:2]
 end
