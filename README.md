@@ -1,5 +1,5 @@
 ## IPNets.jl
-[![Build Status](https://travis-ci.org/JuliaWeb/IPNets.jl.svg?branch=master)](https://travis-ci.org/JuliaWeb/IPNets.jl)
+[![CI](https://github.com/JuliaWeb/IPNets.jl/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/JuliaWeb/IPNets.jl/actions/workflows/ci.yml)
 [![codecov.io](http://codecov.io/github/JuliaWeb/IPNets.jl/coverage.svg?branch=master)](http://codecov.io/github/JuliaWeb/IPNets.jl?branch=master)
 
 

@@ -11,6 +11,7 @@ using IPNets, Test, Sockets
           IPv4Net(ip"1.2.3.4") == IPv4Net(ip"1.2.3.4", 32) ==
           IPv4Net(ip"1.2.3.4", ip"255.255.255.255") ==
           IPNet("1.2.3.4") == IPNet("1.2.3.4/32") ==
+          parse(IPv4Net, SubString("1.2.3.4")) ==
           parse(IPNet, "1.2.3.4") == parse(IPNet, "1.2.3.4/32") ==
           IPv4Net(0x01020304, typemax(UInt32))
     @test IPv4Net("1.2.3.0/24") == parse(IPv4Net, "1.2.3.0/24") ==
@@ -75,6 +76,7 @@ using IPNets, Test, Sockets
     @test IPv6Net("1:2::3:4") == parse(IPv6Net, "1:2::3:4") ==
           IPv6Net("1:2::3:4/128") == parse(IPv6Net, "1:2::3:4/128") ==
           IPv6Net(ip"1:2::3:4") == IPv6Net(ip"1:2::3:4", 128) ==
+          parse(IPv6Net, SubString("1:2::3:4")) ==
           parse(IPNet, "1:2::3:4") == parse(IPNet, "1:2::3:4/128") ==
           IPv6Net(0x00010002000000000000000000030004, typemax(UInt128))
     @test IPv6Net("1:2::3:0/112") == parse(IPv6Net, "1:2::3:0/112") ==
