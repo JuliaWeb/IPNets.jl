@@ -2,7 +2,7 @@ module IPNets
 
 using Sockets: IPAddr, IPv4, IPv6
 
-export IPNet, IPv4Net, IPv6Net
+export IPNet, IPv4Net, IPv6Net, is_private, is_global
 
 abstract type IPNet end
 
@@ -167,5 +167,65 @@ function to_mask(nmaskbits::IT) where IT
 end
 inttype(::IPv4Net) = UInt32
 inttype(::IPv6Net) = UInt128
+
+###############################
+## IP address classification ##
+###############################
+
+# See https://www.iana.org/assignments/iana-ipv4-special-registry/iana-ipv4-special-registry.xhtml
+# and https://github.com/python/cpython/blob/67b3a9995368f89b7ce4a995920b2a83a81c599b/Lib/ipaddress.py#L1543-L1558
+const _private_ipv4_nets = IPv4Net[
+    IPv4Net("0.0.0.0/8"),
+    IPv4Net("10.0.0.0/8"),
+    IPv4Net("127.0.0.0/8"),
+    IPv4Net("169.254.0.0/16"),
+    IPv4Net("172.16.0.0/12"),
+    IPv4Net("192.0.0.0/29"),
+    IPv4Net("192.0.0.170/31"),
+    IPv4Net("192.0.2.0/24"),
+    IPv4Net("192.168.0.0/16"),
+    IPv4Net("198.18.0.0/15"),
+    IPv4Net("198.51.100.0/24"),
+    IPv4Net("203.0.113.0/24"),
+    IPv4Net("240.0.0.0/4"),
+    IPv4Net("255.255.255.255/32"),
+]
+
+# See https://www.iana.org/assignments/iana-ipv6-special-registry/iana-ipv6-special-registry.xhtml
+# and https://github.com/python/cpython/blob/67b3a9995368f89b7ce4a995920b2a83a81c599b/Lib/ipaddress.py#L2258-L2269
+const _private_ipv6_nets = IPv6Net[
+    IPv6Net("::1/128"),
+    IPv6Net("::/128"),
+    IPv6Net("::ffff:0:0/96"),
+    IPv6Net("100::/64"),
+    IPv6Net("2001::/23"),
+    IPv6Net("2001:2::/48"),
+    IPv6Net("2001:db8::/32"),
+    IPv6Net("2001:10::/28"),
+    IPv6Net("fc00::/7"),
+    IPv6Net("fe80::/10"),
+]
+
+"""
+    is_private(ip::Union{IPv4,IPv6})
+
+Return `true` if the IP adress is allocated for private networks.
+
+See [iana-ipv4-special-registry](https://www.iana.org/assignments/iana-ipv4-special-registry/iana-ipv4-special-registry.xhtml) (IPv4)
+and [iana-ipv6-special-registry](https://www.iana.org/assignments/iana-ipv6-special-registry/iana-ipv6-special-registry.xhtml) (IPv6).
+"""
+is_private(::Union{IPv4,IPv6})
+is_private(ip::IPv4) = any(ip in net for net in _private_ipv4_nets)
+is_private(ip::IPv6) = any(ip in net for net in _private_ipv6_nets)
+
+"""
+    is_global(ip::Union{IPv4,IPv6})
+
+Return `true` if the IP adress is allocated for public networks.
+
+See [iana-ipv4-special-registry](https://www.iana.org/assignments/iana-ipv4-special-registry/iana-ipv4-special-registry.xhtml) (IPv4)
+and [iana-ipv6-special-registry](https://www.iana.org/assignments/iana-ipv6-special-registry/iana-ipv6-special-registry.xhtml) (IPv6).
+"""
+is_global(ip::Union{IPv4,IPv6}) = !is_private(ip)
 
 end # module

@@ -67,6 +67,10 @@ using IPNets, Test, Sockets
     @test_throws BoundsError ipnet[256]
     @test_throws BoundsError ipnet[-1:2]
 
+    @test is_private(ip"127.0.0.1")
+    @test !is_global(ip"127.0.0.1")
+    @test !is_private(ip"1.1.1.1")
+    @test is_global(ip"1.1.1.1")
 
     #############
     ## IPv6Net ##
@@ -128,4 +132,9 @@ using IPNets, Test, Sockets
     @test_throws BoundsError ipnet[-1]
     @test_throws BoundsError ipnet[65536]
     @test_throws BoundsError ipnet[-1:2]
+
+    @test is_private(ip"::1")
+    @test !is_global(ip"::1")
+    @test !is_private(ip"2606:4700:4700::1111")
+    @test is_global(ip"2606:4700:4700::1111")
 end
