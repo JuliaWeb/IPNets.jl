@@ -137,4 +137,19 @@ using IPNets, Test, Sockets
     @test !is_global(ip"::1")
     @test !is_private(ip"2606:4700:4700::1111")
     @test is_global(ip"2606:4700:4700::1111")
+
+    ###############
+    ## Both nets ##
+    ###############
+
+    ip6net1 = IPv6Net("2605:dead:beef:ff00::/64")
+    ip6net2 = IPv6Net("::ffff:0:0/96") # IPv4 addresses encoded as IPv6
+    ip4net  = IPv4Net("192.168.0.0/16")
+
+    @test !(ip"192.168.1.200" in ip6net1)
+    @test !(ip"192.168.1.200" in ip6net2) # *
+    @test !(ip"2606:4700:4700::1111" in ip4net)
+    @test !(ip"::ffff:c0a8:01c8" in ip4net) # *
+    # * If IPv4-mapped addresses are considered equivalent, these tests should
+    # be true, but that requires more code.
 end
