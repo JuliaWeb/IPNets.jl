@@ -1,6 +1,6 @@
 name = "IPNets"
 uuid = "66763231-799b-5fff-8662-389acfc33a85"
-version = "1.1.0"
+version = "1.1.1"
 
 [deps]
 Sockets = "6462fe0b-24de-5631-8697-dd941f90decc"
