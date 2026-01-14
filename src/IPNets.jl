@@ -126,6 +126,8 @@ Base.show(io::IO, net::T) where T <: IPNet = print(io, T, "(\"", net, "\")")
 
 Base.in(ip::IPv4, network::IPv4Net) = ip.host & network.netmask == network.netaddr
 Base.in(ip::IPv6, network::IPv6Net) = ip.host & network.netmask == network.netaddr
+Base.in(ip::Any,  network::IPv4Net) = false
+Base.in(ip::Any,  network::IPv6Net) = false
 
 # IP Networks are ordered first by starting network address
 # and then by network mask. That is, smaller IP nets (with higher
